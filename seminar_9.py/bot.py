@@ -2,8 +2,12 @@ import telebot
 import random
 import time
 import json
+import requests
+from bs4 import BeautifulSoup
+from requests import pars
+from import_curce import currency
 
-token = '5903051935:AAGNyKRC6XV0tySiZQCv79ca9V6xtBVM5O4'
+token = ''
 bot = telebot.TeleBot(token)
 
 number = 0
@@ -20,7 +24,7 @@ def welcome(message):
     item_4= telebot.types.KeyboardButton('Как дела?')
     item_5= telebot.types.KeyboardButton('Загадай число')
     item_6= telebot.types.KeyboardButton('Знак зодиака')
-    item_7= telebot.types.KeyboardButton('Покажи id стикера')
+    item_7= telebot.types.KeyboardButton('Проверка актуального курса валют')
     markup.add(item_1, item_2, item_3, item_4, item_5, item_6, item_7)
     bot.send_message(message.chat.id,'Привет! Выбери нужный пункт меню: ', reply_markup=markup)
 
@@ -33,6 +37,9 @@ def answer(message):
         bot.send_message(message.chat.id,'Я рад за тебя!')
     elif message.text.lower()=='плохо':
         bot.send_message(message.chat.id,'Что случилось?')
+    elif message.text.lower()=='проверка акутальногт курса валют':
+        bot.send_message(message.chat.id,'Введите интересующую вас валюту: ')
+        bot.register_next_step_handler(message, imp_curce)
     elif message.text.lower()=='cлучайное число':
         bot.send_message(message.chat.id, str(random.randint(1, 1000)))
     elif message.text.lower()=='таймер':    
@@ -63,10 +70,27 @@ def answer(message):
         item_10= telebot.types.KeyboardButton('Козерог')
         item_11= telebot.types.KeyboardButton('Водолей')
         item_12= telebot.types.KeyboardButton('Рыбы')
+        item_13= telebot.types.KeyboardButton('Назад')
         
-        markup.add(item_1, item_2, item_3, item_4, item_5, item_6, item_7, item_8, item_9, item_10, item_11, item_12)
-        bot.send_message(message.chat.id,'Выбери свой знак зодиака: ',reply_markup=markup)
-        bot.register_next_step_handler(message,horoscope)
+        markup.add(item_1, item_2, item_3, item_4, item_5, item_6, item_7, item_8, item_9, item_10, item_11, item_12, item_13)
+        bot.send_message(message.chat.id, pars(message.text),reply_markup=markup)
+        if message.text != 'Назад':
+            bot.send_message(message.chat.id, dictionary[message.text], reply_markup = markup)
+            bot.register_next_step_handler(message,horoscope)
+        elif message.text == 'Назад':
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            item_1= telebot.types.KeyboardButton('Cлучайное число')
+        item_2= telebot.types.KeyboardButton('Таймер')
+        item_3= telebot.types.KeyboardButton('Кинуть кость')
+        item_4= telebot.types.KeyboardButton('Как дела?')
+        item_5= telebot.types.KeyboardButton('Загадай число')
+        item_6= telebot.types.KeyboardButton('Знак зодиака')
+        item_7= telebot.types.KeyboardButton('Проверка актуального курса валют')
+
+
+        
+
+
     else:
         bot.send_message(message.chat.id,'Даже не знаю, что тебе ответить')
 
@@ -86,12 +110,39 @@ def enigma(message):
 @bot.message_handler(content_types=['text'])
 def horoscope(message):
     markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    item_0= telebot.types.KeyboardButton('Вернуться назад')
-    markup.add(item_0)
-    # bot.send_message(message.chat.id,dictionary[message.text],reply_markup=markup)
-    if message.text != 'Вернуться назад':
-        bot.send_message(message.chat.id,dictionary[message.text],reply_markup=markup)
+    item_1= telebot.types.KeyboardButton('Овен')
+    item_2= telebot.types.KeyboardButton('Телец')
+    item_3= telebot.types.KeyboardButton('Близнецы')
+    item_4= telebot.types.KeyboardButton('Рак')
+    item_5= telebot.types.KeyboardButton('Лев')
+    item_6= telebot.types.KeyboardButton('Дева')
+    item_7= telebot.types.KeyboardButton('Весы')
+    item_8= telebot.types.KeyboardButton('Скорпион')
+    item_9= telebot.types.KeyboardButton('Стрелец')
+    item_10= telebot.types.KeyboardButton('Козерог')
+    item_11= telebot.types.KeyboardButton('Водолей')
+    item_12= telebot.types.KeyboardButton('Рыбы')
+    item_13= telebot.types.KeyboardButton('Назад')
+    markup.add(item_1, item_2, item_3, item_4, item_5, item_6, item_7, item_8, item_9, item_10, item_11, item_12, item_13)
+    if message.text != 'Назад':
+        bot.send_message(message.chat.id, dictionary[message.text], reply_markup = markup)
         bot.register_next_step_handler(message,horoscope)
+    elif message.text == 'Назад':
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item_1= telebot.types.KeyboardButton('Cлучайное число')
+        item_2= telebot.types.KeyboardButton('Таймер')
+        item_3= telebot.types.KeyboardButton('Кинуть кость')
+        item_4= telebot.types.KeyboardButton('Как дела?')
+        item_5= telebot.types.KeyboardButton('Загадай число')
+        item_6= telebot.types.KeyboardButton('Знак зодиака')
+        item_7= telebot.types.KeyboardButton('Проверка актуального курса валют')
+        markup.add(item_1, item_2, item_3, item_4, item_5, item_6, item_7)
+        bot.send_message(message.chat.id,'Привет! Выбери нужный пункт меню:',reply_markup=markup)
+
+bot.message_handler(content_types=['text'])
+def imp_curce(message):
+    bot.send_message(message.chat.id,currency(message.text))
+
 
 bot.polling(none_stop=True)
 
